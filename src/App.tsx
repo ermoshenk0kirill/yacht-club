@@ -1,5 +1,5 @@
 // src/App.tsx
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './app/providers/AuthProvider'
 import { ProtectedRoute } from './app/router/ProtectedRoute'
 
@@ -24,10 +24,12 @@ export default function App() {
   return (
     <AuthProvider>
       <Routes>
+        {/* При открытии сайта сразу показываем регистрацию */}
+        <Route path="/" element={<Navigate to="/register" replace />} />
+
         {/* Public routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
 
         {/* === CAPTAIN ROUTES === */}
         <Route
@@ -94,24 +96,7 @@ export default function App() {
         />
 
         {/* 404 */}
-        <Route
-          path="*"
-          element={
-            <Layout title="404">
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <h1 className="text-8xl font-bold text-purple-500 mb-4">404</h1>
-                <h2 className="text-3xl font-semibold mb-2">Страница не найдена</h2>
-                <p className="text-gray-400 mb-8">Запрошенный адрес не существует</p>
-                <a
-                  href="/"
-                  className="btn btn-primary px-8 py-3 text-lg"
-                >
-                  Вернуться на главную
-                </a>
-              </div>
-            </Layout>
-          }
-        />
+        <Route path="*" element={<Navigate to="/register" replace />} />
       </Routes>
     </AuthProvider>
   )
