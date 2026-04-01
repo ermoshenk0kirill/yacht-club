@@ -129,7 +129,7 @@ export default function CaptainDashboard() {
       {/* === Форма добавления судна === */}
       <div className="bg-[#111] border border-[#222] rounded-3xl p-8">
         <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
-          🚢 Добавить новое судно
+          Добавить новое судно
         </h2>
 
         <form onSubmit={handleVesselSubmit} className="space-y-5">
@@ -230,7 +230,7 @@ export default function CaptainDashboard() {
       {/* === Форма создания заявки === */}
       <div className="bg-[#111] border border-[#222] rounded-3xl p-8">
         <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
-          📅 Создать заявку на заход в порт
+          Создать заявку на заход в порт
         </h2>
 
         <form onSubmit={handleBookingSubmit} className="space-y-5">

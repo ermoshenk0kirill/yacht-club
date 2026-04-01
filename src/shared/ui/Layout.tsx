@@ -38,7 +38,7 @@ export default function Layout({ children, title }: { children: React.ReactNode;
       <nav className="border-b border-[#1f1f1f] bg-[#0f0f0f]">
         <div className="max-w-7xl mx-auto px-8">
           <div className="flex items-center gap-8 py-5">
-            <Link to="/" className="text-gray-400 hover:text-white transition-colors">Главная</Link>
+            <Link to="/" className="text-gray-400 hover:text-white transition-colors">Выход</Link>
 
             {role === 'captain' && (
               <>
