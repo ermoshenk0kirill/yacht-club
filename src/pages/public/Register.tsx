@@ -12,30 +12,46 @@ export default function Register() {
 
   const navigate = useNavigate()
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
+// src/pages/public/Register.tsx
+const register = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setLoading(true)
+  setError(null)
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-        }
-      }
-    })
-
-    if (error) {
-      setError(error.message)
-    } else {
-      alert('Регистрация прошла успешно! Проверьте почту для подтверждения.')
-      navigate('/login')
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { full_name: fullName },
     }
+  })
 
-    setLoading(false)
+  if (error) {
+    // Если email уже существует — пытаемся переотправить письмо
+    if (error.message.includes('already registered') || error.message.includes('User already registered')) {
+      const { error: resendError } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/login`, // куда попадёт после подтверждения
+        }
+      })
+
+      if (resendError) {
+        setError('Этот email уже используется. Не удалось отправить письмо подтверждения.')
+      } else {
+        setError('Этот email уже зарегистрирован. Мы отправили письмо подтверждения повторно. Проверьте почту.')
+      }
+    } else {
+      setError(error.message)
+    }
+  } else {
+    alert('Регистрация прошла успешно! Проверьте почту для подтверждения аккаунта.')
+    navigate('/login')
   }
+
+  setLoading(false)
+}
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6">
@@ -59,7 +75,7 @@ export default function Register() {
             <p className="text-gray-400">Присоединяйтесь к системе управления яхт-портом</p>
           </div>
 
-          <form onSubmit={handleRegister} className="space-y-6">
+          <form onSubmit={register} className="space-y-6">
             <div>
               <label className="block text-sm text-gray-400 mb-2">Полное имя</label>
               <input

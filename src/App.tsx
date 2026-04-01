@@ -14,7 +14,8 @@ import Register from './pages/public/Register'
 import CaptainDashboard from './pages/captain/Dashboard'
 import Vessels from './pages/captain/Vessels'
 import CaptainBookings from './pages/captain/Bookings'
-import Calendar from './pages/captain/Calendar'
+import CaptainCalendar from './pages/captain/Calendar'
+import CaptainNews from './pages/captain/News'           // ← Новая страница
 
 // Manager
 import ManagerBookings from './pages/manager/Bookings'
@@ -24,10 +25,9 @@ export default function App() {
   return (
     <AuthProvider>
       <Routes>
-        {/* При открытии сайта сразу показываем регистрацию */}
         <Route path="/" element={<Navigate to="/register" replace />} />
 
-        {/* Public routes */}
+        {/* Public */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
 
@@ -43,10 +43,20 @@ export default function App() {
           }
         />
         <Route
+          path="/captain/news"
+          element={
+            <ProtectedRoute role="captain">
+              <Layout title="Новости порта">
+                <CaptainNews />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/captain/vessels"
           element={
             <ProtectedRoute role="captain">
-              <Layout title="My Vessels">
+              <Layout title="Мои суда">
                 <Vessels />
               </Layout>
             </ProtectedRoute>
@@ -56,7 +66,7 @@ export default function App() {
           path="/captain/bookings"
           element={
             <ProtectedRoute role="captain">
-              <Layout title="My Bookings">
+              <Layout title="Мои заявки">
                 <CaptainBookings />
               </Layout>
             </ProtectedRoute>
@@ -66,8 +76,8 @@ export default function App() {
           path="/captain/calendar"
           element={
             <ProtectedRoute role="captain">
-              <Layout title="Calendar">
-                <Calendar />
+              <Layout title="Календарь">
+                <CaptainCalendar />
               </Layout>
             </ProtectedRoute>
           }
@@ -78,7 +88,7 @@ export default function App() {
           path="/manager/bookings"
           element={
             <ProtectedRoute role="manager">
-              <Layout title="Manage Bookings">
+              <Layout title="Управление заявками">
                 <ManagerBookings />
               </Layout>
             </ProtectedRoute>
@@ -88,14 +98,13 @@ export default function App() {
           path="/manager/news"
           element={
             <ProtectedRoute role="manager">
-              <Layout title="News Management">
+              <Layout title="Управление новостями">
                 <ManagerNews />
               </Layout>
             </ProtectedRoute>
           }
         />
 
-        {/* 404 */}
         <Route path="*" element={<Navigate to="/register" replace />} />
       </Routes>
     </AuthProvider>
