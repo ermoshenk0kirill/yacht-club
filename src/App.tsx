@@ -1,5 +1,5 @@
 // src/App.tsx
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './app/providers/AuthProvider'
 import { ProtectedRoute } from './app/router/ProtectedRoute'
 
@@ -14,7 +14,8 @@ import Register from './pages/public/Register'
 import CaptainDashboard from './pages/captain/Dashboard'
 import Vessels from './pages/captain/Vessels'
 import CaptainBookings from './pages/captain/Bookings'
-import Calendar from './pages/captain/Calendar'
+import CaptainCalendar from './pages/captain/Calendar'
+import CaptainNews from './pages/captain/News'           // ← Новая страница
 
 // Manager
 import ManagerBookings from './pages/manager/Bookings'
@@ -24,10 +25,11 @@ export default function App() {
   return (
     <AuthProvider>
       <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Navigate to="/register" replace />} />
+
+        {/* Public */}
         <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
 
         {/* === CAPTAIN ROUTES === */}
         <Route
@@ -41,10 +43,20 @@ export default function App() {
           }
         />
         <Route
+          path="/captain/news"
+          element={
+            <ProtectedRoute role="captain">
+              <Layout title="Новости порта">
+                <CaptainNews />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/captain/vessels"
           element={
             <ProtectedRoute role="captain">
-              <Layout title="My Vessels">
+              <Layout title="Мои суда">
                 <Vessels />
               </Layout>
             </ProtectedRoute>
@@ -54,7 +66,7 @@ export default function App() {
           path="/captain/bookings"
           element={
             <ProtectedRoute role="captain">
-              <Layout title="My Bookings">
+              <Layout title="Мои заявки">
                 <CaptainBookings />
               </Layout>
             </ProtectedRoute>
@@ -64,8 +76,8 @@ export default function App() {
           path="/captain/calendar"
           element={
             <ProtectedRoute role="captain">
-              <Layout title="Calendar">
-                <Calendar />
+              <Layout title="Календарь">
+                <CaptainCalendar />
               </Layout>
             </ProtectedRoute>
           }
@@ -76,7 +88,7 @@ export default function App() {
           path="/manager/bookings"
           element={
             <ProtectedRoute role="manager">
-              <Layout title="Manage Bookings">
+              <Layout title="Управление заявками">
                 <ManagerBookings />
               </Layout>
             </ProtectedRoute>
@@ -86,32 +98,14 @@ export default function App() {
           path="/manager/news"
           element={
             <ProtectedRoute role="manager">
-              <Layout title="News Management">
+              <Layout title="Управление новостями">
                 <ManagerNews />
               </Layout>
             </ProtectedRoute>
           }
         />
 
-        {/* 404 */}
-        <Route
-          path="*"
-          element={
-            <Layout title="404">
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <h1 className="text-8xl font-bold text-purple-500 mb-4">404</h1>
-                <h2 className="text-3xl font-semibold mb-2">Страница не найдена</h2>
-                <p className="text-gray-400 mb-8">Запрошенный адрес не существует</p>
-                <a
-                  href="/"
-                  className="btn btn-primary px-8 py-3 text-lg"
-                >
-                  Вернуться на главную
-                </a>
-              </div>
-            </Layout>
-          }
-        />
+        <Route path="*" element={<Navigate to="/register" replace />} />
       </Routes>
     </AuthProvider>
   )

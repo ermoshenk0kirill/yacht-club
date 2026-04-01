@@ -1,33 +1,58 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
 import { supabase } from '../../lib/supabase'
+import type { User } from '@supabase/supabase-js'
 
-const AuthContext = createContext<any>(null)
+type AuthContextType = {
+  user: User | null
+  role: string | null
+  loading: boolean
+}
 
-export const AuthProvider = ({ children }: any) => {
-  const [user, setUser] = useState<any>(null)
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  role: null,
+  loading: true,
+})
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null)
   const [role, setRole] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user))
-
-    supabase.auth.onAuthStateChange((_e, session) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
+      if (!session?.user) setLoading(false)
     })
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      const currentUser = session?.user ?? null
+      setUser(currentUser)
+
+      if (currentUser) {
+        // ← НЕ используем await! Делаем запрос отдельно
+        supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', currentUser.id)
+          .single()
+          .then(({ data, error }) => {
+            if (error) console.error('Profile load error:', error)
+            setRole(data?.role ?? null)
+            setLoading(false)
+          })
+      } else {
+        setRole(null)
+        setLoading(false)
+      }
+    })
+
+    return () => listener.subscription.unsubscribe()
   }, [])
 
-  useEffect(() => {
-    if (!user) return
-
-    supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-      .then(({ data }) => setRole(data?.role ?? null))
-  }, [user])
-
   return (
-    <AuthContext.Provider value={{ user, role }}>
+    <AuthContext.Provider value={{ user, role, loading }}>
       {children}
     </AuthContext.Provider>
   )
