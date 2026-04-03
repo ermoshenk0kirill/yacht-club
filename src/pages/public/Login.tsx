@@ -11,7 +11,7 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null)
 
   const navigate = useNavigate()
-  const { role } = useAuth() // будет обновляться после логина
+  const { role } = useAuth()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,14 +26,13 @@ export default function Login() {
       return
     }
 
-    // Небольшая задержка, чтобы роль успела загрузиться
     setTimeout(() => {
       if (role === 'manager') {
         navigate('/manager/bookings')
       } else if (role === 'captain') {
         navigate('/captain/news')
       } else {
-        navigate('/captain/news') // fallback
+        navigate('/captain/news')
       }
     }, 300)
   }
