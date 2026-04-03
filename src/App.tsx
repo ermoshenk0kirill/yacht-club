@@ -15,7 +15,7 @@ import CaptainDashboard from './pages/captain/Dashboard'
 import Vessels from './pages/captain/Vessels'
 import CaptainBookings from './pages/captain/Bookings'
 import CaptainCalendar from './pages/captain/Calendar'
-import CaptainNews from './pages/captain/News'           // ← Новая страница
+import CaptainNews from './pages/captain/News'
 
 // Manager
 import ManagerBookings from './pages/manager/Bookings'

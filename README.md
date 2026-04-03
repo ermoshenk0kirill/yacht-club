@@ -1,73 +1,116 @@
-# React + TypeScript + Vite
+# Yacht Port System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Адаптивное веб-приложение для электронной подачи документов и мониторинга уведомлений о заходе судов в яхтенный порт**
 
-Currently, two official plugins are available:
+Современная система управления яхтенным портом с удобным интерфейсом для капитанов и диспетчеров.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## React Compiler
+## ✨ Основные возможности
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Для капитанов (владельцев судов)
+- Регистрация и авторизация с подтверждением email
+- Добавление и управление своими судами (название, тип, длина, ширина, осадка, лицензия, регистрационный номер)
+- Подача заявок на заход в порт
+- Просмотр статуса своих заявок
+- Просмотр новостей порта
 
-## Expanding the ESLint configuration
+### Для менеджеров порта (диспетчеров)
+- Просмотр всех заявок с подробной информацией
+- Фильтрация заявок по статусу (Все / В ожидании / Одобрены / Отклонены)
+- Одобрение или отклонение заявок с добавлением комментария
+- Публикация новостей для всех пользователей
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Общие возможности
+- Полностью адаптивный дизайн (смартфоны, планшеты, десктопы)
+- Безопасная аутентификация и разграничение прав доступа
+- Типобезопасность благодаря TypeScript
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🛠 Технологический стек
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **Frontend**: React 19 + TypeScript
+- **Сборка**: Vite
+- **Стилизация**: Tailwind CSS v4
+- **Маршрутизация**: React Router DOM v7
+- **Управление состоянием**: React Context
+- **Backend**: Supabase (PostgreSQL, Authentication, Storage)
+- **Иконки**: Lucide React
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Установка и запуск
+```markdown
+### 1. Клонирование репозитория
+
+```bash
+git clone https://github.com/yourusername/yacht-port-app.git
+cd yacht-port-app
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Установка зависимостей
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+npm install
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 3. Настройка окружения
+
+Создайте файл `.env` в корне проекта:
+
+```env
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+### 4. Запуск в режиме разработки
+
+```bash
+npm run dev
+```
+
+Приложение будет доступно по адресу: `http://localhost:5173`
+
+---
+
+## 📁 Структура проекта
+
+```bash
+src/
+├── app/
+│   └── providers/
+│       └── AuthProvider.tsx          # Глобальное управление авторизацией
+├── pages/
+│   ├── public/                       # Login, Register
+│   ├── captain/                      # Dashboard, Vessels, Bookings, Calendar, News
+│   └── manager/                      # Bookings, News
+├── shared/
+│   └── ui/
+│       └── Layout.tsx                # Общий layout с навигацией
+├── lib/
+│   └── supabase.ts                   # Клиент Supabase и типы
+├── database.types.ts                 # типы базы данных
+├── features/
+└── main.tsx
+```
+
+---
+
+## База данных
+
+Приложение использует **Supabase**. Основные таблицы:
+
+- `profiles` — пользователи и их роли (captain, manager)
+- `vessels` — суда капитанов
+- `bookings` — заявки на заход в порт
+- `news` — новости порта
+- `documents` — документы (заготовка для будущей реализации)
+
+---
+
+## Авторы
+
+- **Ермошенко К.В**  
+  Студент группы ИС-42
+
+- **Абаимов В.И**  
+  Студент группы ИС-41
+
+**Государственный университет морского и речного флота им. адмирала С.О. Макарова (2026)**
 ```

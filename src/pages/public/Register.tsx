@@ -27,13 +27,12 @@ const register = async (e: React.FormEvent) => {
   })
 
   if (error) {
-    // Если email уже существует — пытаемся переотправить письмо
     if (error.message.includes('already registered') || error.message.includes('User already registered')) {
       const { error: resendError } = await supabase.auth.resend({
         type: 'signup',
         email: email,
         options: {
-          emailRedirectTo: `${window.location.origin}/login`, // куда попадёт после подтверждения
+          emailRedirectTo: `${window.location.origin}/login`,
         }
       })
 
