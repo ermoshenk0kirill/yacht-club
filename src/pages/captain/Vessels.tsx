@@ -8,6 +8,7 @@ export default function Vessels() {
   const [vessels, setVessels] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   // Форма добавления судна
   const [formData, setFormData] = useState({
@@ -44,7 +45,7 @@ export default function Vessels() {
     }
 
     const { error } = await supabase.from('vessels').insert({
-      owner_id: user.id,                   
+      owner_id: user.id,
       name: formData.name,
       vessel_type: formData.vessel_type || null,
       length_meters: parseFloat(formData.length_meters),
@@ -55,32 +56,45 @@ export default function Vessels() {
     })
 
     if (error) {
-      console.error(error)
       alert('Ошибка при добавлении судна: ' + error.message)
     } else {
       alert('Судно успешно добавлено!')
-      
-      // Сброс формы
       setFormData({
-        name: '',
-        vessel_type: '',
-        length_meters: '',
-        width_meters: '',
-        draft_meters: '',
-        license_number: '',
-        registration_number: '',
+        name: '', vessel_type: '', length_meters: '', width_meters: '',
+        draft_meters: '', license_number: '', registration_number: ''
       })
       setShowForm(false)
 
-      // Обновляем список судов
+      // Обновляем список
       const { data } = await supabase
         .from('vessels')
         .select('*')
         .eq('owner_id', user.id)
         .order('created_at', { ascending: false })
-
       setVessels(data || [])
     }
+  }
+
+  const deleteVessel = async (vesselId: string, vesselName: string) => {
+    if (!confirm(`Вы уверены, что хотите удалить судно "${vesselName}"?\n\nЭто действие нельзя отменить.`)) {
+      return
+    }
+
+    setDeletingId(vesselId)
+
+    const { error } = await supabase
+      .from('vessels')
+      .delete()
+      .eq('id', vesselId)
+
+    if (error) {
+      alert('Ошибка при удалении судна: ' + error.message)
+    } else {
+      alert(`Судно "${vesselName}" успешно удалено`)
+      setVessels(vessels.filter(v => v.id !== vesselId))
+    }
+
+    setDeletingId(null)
   }
 
   return (
@@ -189,10 +203,7 @@ export default function Vessels() {
             </div>
 
             <div className="md:col-span-2 flex gap-4 pt-4">
-              <button
-                type="submit"
-                className="flex-1 btn btn-primary py-3.5"
-              >
+              <button type="submit" className="flex-1 btn btn-primary py-3.5">
                 Добавить судно
               </button>
               <button
@@ -236,10 +247,6 @@ export default function Vessels() {
                     <p className="text-purple-400 text-sm mt-1">{vessel.vessel_type}</p>
                   )}
                 </div>
-                <div className="text-right">
-                  <div className="text-xs text-gray-500">ID</div>
-                  <div className="font-mono text-sm text-gray-400">{vessel.id.slice(0, 8)}</div>
-                </div>
               </div>
 
               <div className="grid grid-cols-3 gap-4 text-center mb-8">
@@ -267,6 +274,15 @@ export default function Vessels() {
                   <span className="font-medium">{vessel.registration_number}</span>
                 </div>
               </div>
+
+              {/* Кнопка удаления — красная кнопка */}
+              <button
+                onClick={() => deleteVessel(vessel.id, vessel.name)}
+                disabled={deletingId === vessel.id}
+                className="mt-6 w-full bg-red-600 hover:bg-red-700 disabled:bg-red-800 text-white py-3 rounded-2xl text-sm font-medium transition-all"
+              >
+                {deletingId === vessel.id ? 'Удаление...' : 'Удалить судно'}
+              </button>
             </div>
           ))}
         </div>

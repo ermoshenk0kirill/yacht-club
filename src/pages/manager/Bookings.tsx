@@ -11,7 +11,7 @@ type Booking = {
   berth_number: string | null
   request_comment: string | null
   manager_comment: string | null
-  created_at: string | null          // ← Изменено на string | null
+  created_at: string | null
   captain: {
     email: string
     full_name: string
@@ -43,7 +43,6 @@ export default function ManagerBookings() {
     if (error) {
       console.error('Error fetching bookings:', error)
     } else {
-      // Приводим данные к нашему типу
       const typedBookings: Booking[] = (data || []).map((b: any) => ({
         ...b,
         status: b.status as 'pending' | 'approved' | 'rejected' | string,
