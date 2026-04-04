@@ -30,7 +30,15 @@ export default function Login() {
     }
 
     // Убираем setTimeout — лучше полагаться на AuthProvider
-    setLoading(false)
+    setTimeout(() => {
+      if (role === 'manager') {
+        navigate('/manager/bookings')
+      } else if (role === 'captain') {
+        navigate('/captain/news')
+      } else {
+        navigate('/captain/news')
+      }
+    }, 300)
   }
 
   return (
