@@ -72,7 +72,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route
+        {/* <Route
           path="/captain/calendar"
           element={
             <ProtectedRoute role="captain">
@@ -81,7 +81,7 @@ export default function App() {
               </Layout>
             </ProtectedRoute>
           }
-        />
+        /> */}
 
         {/* === MANAGER ROUTES === */}
         <Route

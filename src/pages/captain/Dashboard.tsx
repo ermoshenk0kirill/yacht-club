@@ -3,6 +3,14 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../app/providers/AuthProvider'
 
+// Заранее заданные номера причалов (можно легко расширять)
+const AVAILABLE_BERTHS = [
+  'A-01', 'A-02', 'A-03', 'A-04', 'A-05',
+  'B-01', 'B-02', 'B-03', 'B-04', 'B-05',
+  'C-01', 'C-02', 'C-03',
+  'D-01', 'D-02'
+]
+
 export default function CaptainDashboard() {
   const { user } = useAuth()
   const [vessels, setVessels] = useState<any[]>([])
@@ -54,7 +62,7 @@ export default function CaptainDashboard() {
     setLoading(true)
 
     const { error } = await supabase.from('vessels').insert({
-      owner_id: user.id,                    // ← Это было обязательно!
+      owner_id: user.id,
       name: vesselForm.name,
       vessel_type: vesselForm.vessel_type || null,
       length_meters: parseFloat(vesselForm.length_meters),
@@ -65,21 +73,13 @@ export default function CaptainDashboard() {
     })
 
     if (error) {
-      console.error(error)
       alert('Ошибка при добавлении судна: ' + error.message)
     } else {
       alert('Судно успешно добавлено!')
-      // Сброс формы
       setVesselForm({
-        name: '',
-        vessel_type: '',
-        length_meters: '',
-        width_meters: '',
-        draft_meters: '',
-        license_number: '',
-        registration_number: '',
+        name: '', vessel_type: '', length_meters: '', width_meters: '',
+        draft_meters: '', license_number: '', registration_number: ''
       })
-      // Обновляем список судов
       window.location.reload()
     }
 
@@ -134,7 +134,7 @@ export default function CaptainDashboard() {
 
         <form onSubmit={handleVesselSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm text-gray-400 mb-1.5">Название судна *</label>
+            <label className="block text-sm text-gray-400 mb-1.5">Название судна</label>
             <input
               type="text"
               value={vesselForm.name}
@@ -157,7 +157,7 @@ export default function CaptainDashboard() {
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1.5">Номер лицензии *</label>
+              <label className="block text-sm text-gray-400 mb-1.5">Номер лицензии</label>
               <input
                 type="text"
                 value={vesselForm.license_number}
@@ -171,7 +171,7 @@ export default function CaptainDashboard() {
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1.5">Длина (м) *</label>
+              <label className="block text-sm text-gray-400 mb-1.5">Длина (м)</label>
               <input
                 type="number"
                 step="0.1"
@@ -182,7 +182,7 @@ export default function CaptainDashboard() {
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1.5">Ширина (м) *</label>
+              <label className="block text-sm text-gray-400 mb-1.5">Ширина (м)</label>
               <input
                 type="number"
                 step="0.1"
@@ -193,7 +193,7 @@ export default function CaptainDashboard() {
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1.5">Осадка (м) *</label>
+              <label className="block text-sm text-gray-400 mb-1.5">Осадка (м)</label>
               <input
                 type="number"
                 step="0.1"
@@ -206,7 +206,7 @@ export default function CaptainDashboard() {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1.5">Регистрационный номер *</label>
+            <label className="block text-sm text-gray-400 mb-1.5">Регистрационный номер</label>
             <input
               type="text"
               value={vesselForm.registration_number}
@@ -235,14 +235,14 @@ export default function CaptainDashboard() {
 
         <form onSubmit={handleBookingSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm text-gray-400 mb-1.5">Выберите судно *</label>
+            <label className="block text-sm text-gray-400 mb-1.5">Выберите судно</label>
             <select
               value={bookingForm.vessel_id}
               onChange={(e) => setBookingForm({ ...bookingForm, vessel_id: e.target.value })}
               className="input w-full"
               required
             >
-              <option value="">— Выберите судно —</option>
+              <option value="">— Выбрать судно —</option>
               {vessels.map((vessel) => (
                 <option key={vessel.id} value={vessel.id}>
                   {vessel.name} — {vessel.length_meters}м
@@ -252,7 +252,7 @@ export default function CaptainDashboard() {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1.5">Дата захода *</label>
+            <label className="block text-sm text-gray-400 mb-1.5">Дата захода</label>
             <input
               type="date"
               value={bookingForm.date}
@@ -283,15 +283,22 @@ export default function CaptainDashboard() {
             </div>
           </div>
 
+          {/* Изменённое поле — выпадающий список причалов */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1.5">Номер берта (причал)</label>
-            <input
-              type="text"
+            <label className="block text-sm text-gray-400 mb-1.5">Желаемый берт (причал)</label>
+            <select
               value={bookingForm.berth_number}
               onChange={(e) => setBookingForm({ ...bookingForm, berth_number: e.target.value })}
               className="input w-full"
-              placeholder="A-12 или Pier 5"
-            />
+            >
+              <option value="">— Выбрать причал —</option>
+              {AVAILABLE_BERTHS.map((berth) => (
+                <option key={berth} value={berth}>
+                  {berth}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1.5">Выберите предпочтительный причал</p>
           </div>
 
           <div>

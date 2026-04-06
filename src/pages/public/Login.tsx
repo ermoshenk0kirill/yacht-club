@@ -3,10 +3,13 @@ import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../app/providers/AuthProvider'
+import eyeIcon from '../../assets/icons/eye.svg'
+import eyeOffIcon from '../../assets/icons/eye-off.svg'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)   // ← Новое состояние
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -26,6 +29,7 @@ export default function Login() {
       return
     }
 
+    // Убираем setTimeout — лучше полагаться на AuthProvider
     setTimeout(() => {
       if (role === 'manager') {
         navigate('/manager/bookings')
@@ -73,17 +77,32 @@ export default function Login() {
 
             <div>
               <label className="block text-sm text-gray-400 mb-1.5">Пароль</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[#1a1a1a] border border-[#333] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
-                placeholder="••••••••"
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-[#1a1a1a] border border-[#333] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 pr-12"                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"                >
+                  <img 
+      src={showPassword ? eyeOffIcon : eyeIcon} 
+      alt={showPassword ? "Скрыть пароль" : "Показать пароль"}
+      className="w-5 h-5"
+    />
+                </button>
+              </div>
             </div>
 
-            {error && <div className="text-red-400 text-sm text-center bg-red-950/50 border border-red-900 p-3 rounded-xl">{error}</div>}
+            {error && (
+              <div className="text-red-400 text-sm text-center bg-red-950/50 border border-red-900 p-3 rounded-xl">
+                {error}
+              </div>
+            )}
 
             <button
               type="submit"

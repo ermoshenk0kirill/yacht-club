@@ -31,7 +31,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(currentUser)
 
       if (currentUser) {
-        // ← НЕ используем await! Делаем запрос отдельно
         supabase
           .from('profiles')
           .select('role')

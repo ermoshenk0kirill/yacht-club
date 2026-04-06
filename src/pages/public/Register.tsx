@@ -2,60 +2,61 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useNavigate, Link } from 'react-router-dom'
+import eyeIcon from '../../assets/icons/eye.svg'
+import eyeOffIcon from '../../assets/icons/eye-off.svg'
 
 export default function Register() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
+  const [showPassword, setShowPassword] = useState(false)   // ← Добавили
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const navigate = useNavigate()
 
-// src/pages/public/Register.tsx
-const register = async (e: React.FormEvent) => {
-  e.preventDefault()
-  setLoading(true)
-  setError(null)
+  const register = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
 
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { full_name: fullName },
-    }
-  })
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName },
+      }
+    })
 
-  if (error) {
-    if (error.message.includes('already registered') || error.message.includes('User already registered')) {
-      const { error: resendError } = await supabase.auth.resend({
-        type: 'signup',
-        email: email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/login`,
+    if (error) {
+      if (error.message.includes('already registered') || error.message.includes('User already registered')) {
+        const { error: resendError } = await supabase.auth.resend({
+          type: 'signup',
+          email: email,
+          options: {
+            emailRedirectTo: `${window.location.origin}/login`,
+          }
+        })
+
+        if (resendError) {
+          setError('Этот email уже используется. Не удалось отправить письмо подтверждения.')
+        } else {
+          setError('Этот email уже зарегистрирован. Мы отправили письмо подтверждения повторно. Проверьте почту.')
         }
-      })
-
-      if (resendError) {
-        setError('Этот email уже используется. Не удалось отправить письмо подтверждения.')
       } else {
-        setError('Этот email уже зарегистрирован. Мы отправили письмо подтверждения повторно. Проверьте почту.')
+        setError(error.message)
       }
     } else {
-      setError(error.message)
+      alert('Регистрация прошла успешно! Проверьте почту для подтверждения аккаунта.')
+      navigate('/login')
     }
-  } else {
-    alert('Регистрация прошла успешно! Проверьте почту для подтверждения аккаунта.')
-    navigate('/login')
-  }
 
-  setLoading(false)
-}
+    setLoading(false)
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6">
       <div className="w-full max-w-md">
-        {/* Логотип */}
         <div className="flex justify-center mb-10">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-violet-500 rounded-2xl flex items-center justify-center text-white font-bold text-3xl shadow-lg">
@@ -68,7 +69,7 @@ const register = async (e: React.FormEvent) => {
           </div>
         </div>
 
-        <div className="glass rounded-3xl p-10 shadow-2xl border border-purple-900/30">
+        <div className="bg-[#111] border border-[#222] rounded-3xl p-10 shadow-2xl">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-semibold text-white mb-2">Создать аккаунт</h1>
             <p className="text-gray-400">Присоединяйтесь к системе управления яхт-портом</p>
@@ -101,15 +102,27 @@ const register = async (e: React.FormEvent) => {
 
             <div>
               <label className="block text-sm text-gray-400 mb-2">Пароль</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="input w-full"
-                placeholder="••••••••"
-                required
-                minLength={6}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-[#1a1a1a] border border-[#333] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 pr-12"
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                >
+<img 
+      src={showPassword ? eyeOffIcon : eyeIcon} 
+      alt={showPassword ? "Скрыть пароль" : "Показать пароль"}
+      className="w-5 h-5"
+    />                </button>
+              </div>
             </div>
 
             {error && (

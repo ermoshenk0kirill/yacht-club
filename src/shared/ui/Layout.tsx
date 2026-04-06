@@ -46,7 +46,7 @@ export default function Layout({ children, title }: { children: React.ReactNode;
                 <Link to="/captain/news" className={`nav-link ${isActive('/captain/news') ? 'active' : ''}`}>Новости</Link>
                 <Link to="/captain/vessels" className={`nav-link ${isActive('/captain/vessels') ? 'active' : ''}`}>Мои суда</Link>
                 <Link to="/captain/bookings" className={`nav-link ${isActive('/captain/bookings') ? 'active' : ''}`}>Заявки</Link>
-                <Link to="/captain/calendar" className={`nav-link ${isActive('/captain/calendar') ? 'active' : ''}`}>Календарь</Link>
+                {/* <Link to="/captain/calendar" className={`nav-link ${isActive('/captain/calendar') ? 'active' : ''}`}>Календарь</Link> */}
               </>
             )}
 
