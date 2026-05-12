@@ -1,12 +1,19 @@
 // src/shared/ui/Layout.tsx
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../app/providers/AuthProvider'
+import { supabase } from '../../lib/supabase'
 
 export default function Layout({ children, title }: { children: React.ReactNode; title?: string }) {
   const { user, role } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
 
   const isActive = (path: string) => location.pathname === path
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    navigate('/login')
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
@@ -38,15 +45,20 @@ export default function Layout({ children, title }: { children: React.ReactNode;
       <nav className="border-b border-[#1f1f1f] bg-[#0f0f0f]">
         <div className="max-w-7xl mx-auto px-8">
           <div className="flex items-center gap-8 py-5">
-            <Link to="/" className="text-gray-400 hover:text-white transition-colors">Выход</Link>
+            <button 
+              onClick={handleLogout}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              Выход
+            </button>
 
             {role === 'captain' && (
               <>
-                <Link to="/captain" className={`nav-link ${isActive('/captain') ? 'active' : ''}`}>Дашборд</Link>
+                <Link to="/captain" className={`nav-link ${isActive('/captain') ? 'active' : ''}`}>Главная</Link>
                 <Link to="/captain/news" className={`nav-link ${isActive('/captain/news') ? 'active' : ''}`}>Новости</Link>
                 <Link to="/captain/vessels" className={`nav-link ${isActive('/captain/vessels') ? 'active' : ''}`}>Мои суда</Link>
                 <Link to="/captain/bookings" className={`nav-link ${isActive('/captain/bookings') ? 'active' : ''}`}>Заявки</Link>
-                {/* <Link to="/captain/calendar" className={`nav-link ${isActive('/captain/calendar') ? 'active' : ''}`}>Календарь</Link> */}
+                <Link to="/captain/calendar" className={`nav-link ${isActive('/captain/calendar') ? 'active' : ''}`}>Календарь</Link>
               </>
             )}
 
