@@ -20,26 +20,49 @@ export default function Login() {
     e.preventDefault()
     setLoading(true)
     setError(null)
-
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-
+  
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  
     if (error) {
       setError(error.message)
       setLoading(false)
       return
     }
-
-    // Убираем setTimeout — лучше полагаться на AuthProvider
-    setTimeout(() => {
-      if (role === 'manager') {
+  
+    // Сразу после входа получаем роль
+    if (data.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single()
+      
+      const userRole = profile?.role ?? 'captain'
+      
+      if (userRole === 'manager') {
         navigate('/manager/bookings')
-      } else if (role === 'captain') {
-        navigate('/captain/news')
       } else {
         navigate('/captain/news')
       }
-    }, 300)
+    }
+    
+    setLoading(false)
   }
+  
+    
+
+    // Убираем setTimeout — лучше полагаться на AuthProvider
+    // setTimeout(() => {
+    //   if (role === 'manager') {
+    //     navigate('/manager/bookings')
+    //   } else if (role === 'captain') {
+    //     navigate('/captain/news')
+    //   } else {
+    //     navigate('/captain/news')
+    //   }
+    // }, 100)
+
+  // }
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6">

@@ -9,7 +9,7 @@ export default function Register() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
-  const [showPassword, setShowPassword] = useState(false)   // ← Добавили
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -20,38 +20,42 @@ export default function Register() {
     setLoading(true)
     setError(null)
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName },
-      }
-    })
-
-    if (error) {
-      if (error.message.includes('already registered') || error.message.includes('User already registered')) {
-        const { error: resendError } = await supabase.auth.resend({
-          type: 'signup',
-          email: email,
-          options: {
-            emailRedirectTo: `${window.location.origin}/login`,
-          }
-        })
-
-        if (resendError) {
-          setError('Этот email уже используется. Не удалось отправить письмо подтверждения.')
-        } else {
-          setError('Этот email уже зарегистрирован. Мы отправили письмо подтверждения повторно. Проверьте почту.')
+    try {
+      // 1. Регистрация через Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: fullName }
         }
-      } else {
-        setError(error.message)
-      }
-    } else {
-      alert('Регистрация прошла успешно! Проверьте почту для подтверждения аккаунта.')
-      navigate('/login')
-    }
+      })
 
-    setLoading(false)
+      if (authError) throw authError
+
+      // 2. Создаём профиль в нашей таблице (если auth прошёл успешно)
+      if (authData.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: authData.user.id,
+            email: email,
+            full_name: fullName,
+            role: 'captain',           // по умолчанию капитан
+            is_active: true
+          })
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError)
+        }
+      }
+
+      alert('Регистрация прошла успешно! Проверьте почту для подтверждения.')
+      navigate('/login')
+    } catch (err: any) {
+      setError(err.message || 'Ошибка регистрации')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -117,11 +121,12 @@ export default function Register() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                 >
-<img 
-      src={showPassword ? eyeOffIcon : eyeIcon} 
-      alt={showPassword ? "Скрыть пароль" : "Показать пароль"}
-      className="w-5 h-5"
-    />                </button>
+                  <img 
+                    src={showPassword ? eyeOffIcon : eyeIcon} 
+                    alt={showPassword ? "Скрыть пароль" : "Показать пароль"}
+                    className="w-5 h-5"
+                  />
+                </button>
               </div>
             </div>
 
@@ -147,10 +152,6 @@ export default function Register() {
             </Link>
           </div>
         </div>
-
-        <p className="text-center text-xs text-gray-500 mt-8">
-          © 2026 Yacht Port System
-        </p>
       </div>
     </div>
   )

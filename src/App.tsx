@@ -36,7 +36,7 @@ export default function App() {
           path="/captain"
           element={
             <ProtectedRoute role="captain">
-              <Layout title="Dashboard">
+              <Layout title="">
                 <CaptainDashboard />
               </Layout>
             </ProtectedRoute>
@@ -46,7 +46,7 @@ export default function App() {
           path="/captain/news"
           element={
             <ProtectedRoute role="captain">
-              <Layout title="Новости порта">
+              <Layout title="">
                 <CaptainNews />
               </Layout>
             </ProtectedRoute>
@@ -56,7 +56,7 @@ export default function App() {
           path="/captain/vessels"
           element={
             <ProtectedRoute role="captain">
-              <Layout title="Мои суда">
+              <Layout title="">
                 <Vessels />
               </Layout>
             </ProtectedRoute>
@@ -66,29 +66,29 @@ export default function App() {
           path="/captain/bookings"
           element={
             <ProtectedRoute role="captain">
-              <Layout title="Мои заявки">
+              <Layout title="">
                 <CaptainBookings />
               </Layout>
             </ProtectedRoute>
           }
         />
-        {/* <Route
+        <Route
           path="/captain/calendar"
           element={
             <ProtectedRoute role="captain">
-              <Layout title="Календарь">
+              <Layout title="">
                 <CaptainCalendar />
               </Layout>
             </ProtectedRoute>
           }
-        /> */}
+        />
 
         {/* === MANAGER ROUTES === */}
         <Route
           path="/manager/bookings"
           element={
             <ProtectedRoute role="manager">
-              <Layout title="Управление заявками">
+              <Layout title="">
                 <ManagerBookings />
               </Layout>
             </ProtectedRoute>
@@ -98,7 +98,7 @@ export default function App() {
           path="/manager/news"
           element={
             <ProtectedRoute role="manager">
-              <Layout title="Управление новостями">
+              <Layout title="">
                 <ManagerNews />
               </Layout>
             </ProtectedRoute>
